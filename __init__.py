@@ -47,6 +47,13 @@ class CropmanAddPlaceholder(bpy.types.Operator):
         return {"FINISHED"}
 
 
+def showMessageBox(message="", title="Message Box", icon="INFO"):
+    def draw(self, context):
+        self.layout.label(text=message)
+
+    bpy.context.window_manager.popup_menu(draw, title=title, icon=icon)
+
+
 class CropmanCropAllPlaceholders(bpy.types.Operator):
     bl_idname = "cropman.crop_all_placeholder"
     bl_label = "全てのplaceholderを切り抜く"
@@ -54,7 +61,11 @@ class CropmanCropAllPlaceholders(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
-        print(f"{self.bl_idname}を実行しました。")
+        props = context.scene.cropman_props
+        if props.target_strip == ID_NOT_SELECTED:
+            showMessageBox(message="Crop対象ストリップの選択を選択してください!!")
+        else:
+            print(f"{self.bl_idname}を実行しました。target strip: {props.target_strip}")
         return {"FINISHED"}
 
 
