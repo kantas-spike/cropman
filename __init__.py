@@ -10,20 +10,28 @@ bl_info = {
     "category": "Sequencer",
 }
 
+ENUM_STRING_CACHE = {}
+
+ID_NOT_SELECTED = "@@@not_selected@@@"
+
+
+def strip_names_callback(self, context):
+    items = [(ID_NOT_SELECTED, "", "not selected")]
+
+    for seq in bpy.context.scene.sequence_editor.sequences:
+        # [(identifier, name, description, icon, number), ...]
+        key = seq.name
+        ENUM_STRING_CACHE.setdefault(key, key)
+        items.append((key, f"{seq.type}: {seq.name}", f"{seq.type}: {seq.name}"))
+
+    return items
+
 
 class CropmanProperties(bpy.types.PropertyGroup):
     target_strip: bpy.props.EnumProperty(
         name="target strip",
         description="Crop対象のstrip",
-        items=[
-            (
-                "unselected",
-                "  ",
-                "未選択",
-            ),
-            ("a", "A", "あ"),
-            ("b", "B", "い"),
-        ],  # [(identifier, name, description, icon, number), ...]
+        items=strip_names_callback,
         default=0,
     )  # type: ignore
 
