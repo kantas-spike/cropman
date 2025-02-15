@@ -11,6 +11,23 @@ bl_info = {
 }
 
 
+class CropmanProperties(bpy.types.PropertyGroup):
+    target_strip: bpy.props.EnumProperty(
+        name="target strip",
+        description="Crop対象のstrip",
+        items=[
+            (
+                "unselected",
+                "  ",
+                "未選択",
+            ),
+            ("a", "A", "あ"),
+            ("b", "B", "い"),
+        ],  # [(identifier, name, description, icon, number), ...]
+        default=0,
+    )  # type: ignore
+
+
 class CropmanAddPlaceholder(bpy.types.Operator):
     bl_idname = "cropman.add_placeholder"
     bl_label = "placeholderを追加"
@@ -45,26 +62,41 @@ class CropmanMainPanel(bpy.types.Panel):
         return context.space_data.view_type == "SEQUENCER"
 
     def draw(self, context):
+        props = context.scene.cropman_props
         layout = self.layout
         layout.label(text="Crop対象ストリップの選択")
+        layout.prop(props, "target_strip")
         layout.label(text="Placeholder操作")
         layout.operator(CropmanAddPlaceholder.bl_idname)
         layout.label(text="Crop操作")
         layout.operator(CropmanCropAllPlaceholders.bl_idname)
 
 
-classes = [CropmanAddPlaceholder, CropmanCropAllPlaceholders, CropmanMainPanel]
+def register_props():
+    bpy.types.Scene.cropman_props = bpy.props.PointerProperty(type=CropmanProperties)
+
+
+def unregister_props():
+    del bpy.types.Scene.cropman_props
+
+
+classes = [
+    CropmanProperties,
+    CropmanAddPlaceholder,
+    CropmanCropAllPlaceholders,
+    CropmanMainPanel,
+]
 
 
 def register():
     for c in classes:
         bpy.utils.register_class(c)
-
+    register_props()
     print(f"{bl_info['name']}が有効化されました")
 
 
 def unregister():
+    unregister_props()
     for c in reversed(classes):
         bpy.utils.unregister_class(c)
-
     print(f"{bl_info['name']}が無効化されました")
