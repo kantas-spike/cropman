@@ -1,0 +1,3 @@
+# Cropman
+
+VSEで指定サイズにクロップしたtransformストリップを追加するBlenderのaddonです。
