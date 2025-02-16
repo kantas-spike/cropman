@@ -45,6 +45,27 @@ def get_placeholder_rect_for_crop(placeholder_strip):
     return tuple([round(elm) for elm in crop_info])
 
 
+def move_center(strip):
+    screen_rect = get_screen_rect()
+    screen_w = screen_rect[2]
+    screen_h = screen_rect[3]
+    strip_origin = strip.transform.origin
+    strip_w = screen_rect[2] * strip.transform.scale_x
+    strip_h = screen_rect[3] * strip.transform.scale_y
+    strip_half_w = strip_w * 0.5
+    strip_half_h = strip_h * 0.5
+    global_origin_x = screen_w * strip_origin[0] + strip.transform.offset_x
+    global_origin_y = screen_h * strip_origin[1] + strip.transform.offset_y
+    screen_center_x = screen_w / 2
+    screen_center_y = screen_h / 2
+    strip.transform.offset_x += (
+        screen_center_x - global_origin_x - (strip_half_w - strip_w * strip_origin[0])
+    )
+    strip.transform.offset_y += (
+        screen_center_y - global_origin_y - (strip_half_h - strip_h * strip_origin[1])
+    )
+
+
 def is_placeholder(strip):
     if (
         strip.get(CUSTOM_KEY_GENERATER) == ADDON_NAME
@@ -145,6 +166,9 @@ class CropmanAddPlaceholder(bpy.types.Operator):
         )
         placeholder_strip.transform.scale_x = 0.2
         placeholder_strip.transform.scale_y = 0.3
+        placeholder_strip.transform.origin[0] = 0
+        placeholder_strip.transform.origin[1] = 1.0
+        move_center(placeholder_strip)
         placeholder_strip.color = (0, 0, 1)
         placeholder_strip.blend_alpha = 0.35
         placeholder_strip[CUSTOM_KEY_GENERATER] = ADDON_NAME
@@ -189,6 +213,8 @@ class CropmanCropAllPlaceholders(bpy.types.Operator):
                     frame_start=target_strip.frame_final_start,
                     seq1=target_strip,
                 )
+                # transform_strip.transform.origin[0] = 0
+                # transform_strip.transform.origin[1] = 1.0
                 transform_strip[CUSTOM_KEY_GENERATER] = ADDON_NAME
                 transform_strip[CUSTOM_KEY_STRIP_TYPE] = STRIP_TYPE_CROPPED_TRANSFORM
                 transform_strip[CUSTOM_KEY_PLACEHOLDER_ID] = transform_strip.name
