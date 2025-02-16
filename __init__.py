@@ -66,7 +66,7 @@ def strip_names_callback(self, context):
     items = [(ID_NOT_SELECTED, "Please select Strip Name ...", "not selected")]
 
     for seq in bpy.context.scene.sequence_editor.sequences:
-        if is_addon_generated(seq):
+        if is_placeholder(seq):
             continue
 
         # [(identifier, name, description, icon, number), ...]
