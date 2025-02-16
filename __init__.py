@@ -23,7 +23,7 @@ def get_screen_rect():
     return tuple([0, 0, round(width), round(height)])
 
 
-def get_placeholder_rect_for_crop(placeholder_strip: bpy.types.ColorSequence):
+def get_placeholder_rect_for_crop(placeholder_strip):
     screen_rect = get_screen_rect()
     screen_w = screen_rect[2]
     screen_h = screen_rect[3]
@@ -45,7 +45,7 @@ def get_placeholder_rect_for_crop(placeholder_strip: bpy.types.ColorSequence):
     return tuple([round(elm) for elm in crop_info])
 
 
-def is_placeholder(strip: bpy.types.Sequence):
+def is_placeholder(strip):
     if (
         strip.get(CUSTOM_KEY_GENERATER) == ADDON_NAME
         and strip.get(CUSTOM_KEY_STRIP_TYPE) == STRIP_TYPE_PLACEHOLDER
@@ -55,7 +55,7 @@ def is_placeholder(strip: bpy.types.Sequence):
         return False
 
 
-def is_addon_generated(strip: bpy.types.Sequence):
+def is_addon_generated(strip):
     if strip.get(CUSTOM_KEY_GENERATER) == ADDON_NAME:
         return True
     else:
@@ -98,8 +98,7 @@ STRIP_TYPE_CROPPED_TRANSFORM = "cropped_transform"
 
 def guess_available_channel(frame_start, frame_end, target_channel, seqs):
     unavailable_channels = set()
-    for s in seqs:
-        seq: bpy.types.Sequence = s
+    for seq in seqs:
         if seq.channel in unavailable_channels:
             continue
         elif (
@@ -137,7 +136,7 @@ class CropmanAddPlaceholder(bpy.types.Operator):
             cur_frame, frame_end, DEFAULT_PLACEHOLDER_CHANNEL_NO, seqs
         )
 
-        placeholder_strip: bpy.types.ColorSequence = seqs.new_effect(
+        placeholder_strip = seqs.new_effect(
             name=f"placeholder_{datetime.datetime.now().timestamp()}",
             type="COLOR",
             frame_start=cur_frame,
@@ -183,7 +182,7 @@ class CropmanCropAllPlaceholders(bpy.types.Operator):
                 crop_info = get_placeholder_rect_for_crop(placeholder_strip)
                 seqs.remove(placeholder_strip)
                 # transform stripを追加
-                transform_strip: bpy.types.TransformSequence = seqs.new_effect(
+                transform_strip = seqs.new_effect(
                     name=f"cropped_{datetime.datetime.now().timestamp()}",
                     type="TRANSFORM",
                     channel=charnnel_no,
