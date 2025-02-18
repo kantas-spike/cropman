@@ -220,6 +220,13 @@ class CropmanCropAllPlaceholders(bpy.types.Operator):
                 transform_strip.crop.max_x = crop_info[1]
                 transform_strip.crop.max_y = crop_info[2]
                 transform_strip.crop.min_y = crop_info[3]
+                screen_rect = get_screen_rect()
+                screen_w = screen_rect[2]
+                screen_h = screen_rect[3]
+                transform_strip.transform.origin[0] = crop_info[0] / screen_w
+                transform_strip.transform.origin[1] = (
+                    screen_h - crop_info[2]
+                ) / screen_h
         return {"FINISHED"}
 
 
