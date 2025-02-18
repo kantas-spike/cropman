@@ -1,5 +1,6 @@
 import bpy
 import datetime
+from . import utils
 
 bl_info = {
     "name": "Cropman",
@@ -14,54 +15,6 @@ bl_info = {
 ENUM_STRING_CACHE = {}
 
 ID_NOT_SELECTED = "@@@not_selected@@@"
-
-
-def get_screen_rect():
-    render = bpy.context.scene.render
-    width = render.resolution_x * (render.resolution_percentage / 100)
-    height = render.resolution_y * (render.resolution_percentage / 100)
-    return tuple([0, 0, round(width), round(height)])
-
-
-def get_placeholder_rect_for_crop(placeholder_strip):
-    screen_rect = get_screen_rect()
-    screen_w = screen_rect[2]
-    screen_h = screen_rect[3]
-    strip_origin = placeholder_strip.transform.origin
-    strip_w = screen_rect[2] * placeholder_strip.transform.scale_x
-    strip_h = screen_rect[3] * placeholder_strip.transform.scale_y
-    global_origin_x = screen_w * strip_origin[0] + placeholder_strip.transform.offset_x
-    global_origin_y = screen_h * strip_origin[1] + placeholder_strip.transform.offset_y
-    strip_l = global_origin_x - (strip_w * strip_origin[0])
-    strip_b = global_origin_y - (strip_h * strip_origin[1])
-
-    # (crop_left, crop_right, crop_top, crop_bottom)
-    crop_info = [
-        strip_l,
-        screen_w - (strip_l + strip_w),
-        screen_h - (strip_b + strip_h),
-        strip_b,
-    ]
-    return tuple([round(elm) for elm in crop_info])
-
-
-def move_center(strip):
-    screen_rect = get_screen_rect()
-    screen_w = screen_rect[2]
-    screen_h = screen_rect[3]
-    strip_origin = strip.transform.origin
-    strip_w = screen_rect[2] * strip.transform.scale_x
-    strip_h = screen_rect[3] * strip.transform.scale_y
-    global_origin_x = screen_w * strip_origin[0] + strip.transform.offset_x
-    global_origin_y = screen_h * strip_origin[1] + strip.transform.offset_y
-    screen_center_x = screen_w / 2
-    screen_center_y = screen_h / 2
-    strip.transform.offset_x += (
-        screen_center_x - global_origin_x - (0.5 - strip_origin[0]) * strip_w
-    )
-    strip.transform.offset_y += (
-        screen_center_y - global_origin_y - (0.5 - strip_origin[1]) * strip_h
-    )
 
 
 def is_placeholder(strip):
@@ -166,14 +119,12 @@ class CropmanAddPlaceholder(bpy.types.Operator):
         placeholder_strip.transform.scale_y = 0.3
         placeholder_strip.transform.origin[0] = 0
         placeholder_strip.transform.origin[1] = 1.0
-        move_center(placeholder_strip)
+        utils.move_center(placeholder_strip)
         placeholder_strip.color = (0, 0, 1)
         placeholder_strip.blend_alpha = 0.35
         placeholder_strip[CUSTOM_KEY_GENERATER] = ADDON_NAME
         placeholder_strip[CUSTOM_KEY_STRIP_TYPE] = STRIP_TYPE_PLACEHOLDER
         placeholder_strip[CUSTOM_KEY_PLACEHOLDER_ID] = placeholder_strip.name
-
-        # context.scene.sequence_editor.active_strip = placeholder_strip
 
         return {"FINISHED"}
 
@@ -201,7 +152,7 @@ class CropmanCropAllPlaceholders(bpy.types.Operator):
             target_strip = seqs.get(props.target_strip)
             for placeholder_strip in placeholder_list:
                 charnnel_no = placeholder_strip.channel
-                crop_info = get_placeholder_rect_for_crop(placeholder_strip)
+                crop_info = utils.get_crop_info(placeholder_strip)
                 seqs.remove(placeholder_strip)
                 # transform stripを追加
                 transform_strip = seqs.new_effect(
@@ -211,22 +162,18 @@ class CropmanCropAllPlaceholders(bpy.types.Operator):
                     frame_start=target_strip.frame_final_start,
                     seq1=target_strip,
                 )
-                # transform_strip.transform.origin[0] = 0
-                # transform_strip.transform.origin[1] = 1.0
                 transform_strip[CUSTOM_KEY_GENERATER] = ADDON_NAME
                 transform_strip[CUSTOM_KEY_STRIP_TYPE] = STRIP_TYPE_CROPPED_TRANSFORM
                 transform_strip[CUSTOM_KEY_PLACEHOLDER_ID] = transform_strip.name
-                transform_strip.crop.min_x = crop_info[0]
-                transform_strip.crop.max_x = crop_info[1]
-                transform_strip.crop.max_y = crop_info[2]
-                transform_strip.crop.min_y = crop_info[3]
-                screen_rect = get_screen_rect()
-                screen_w = screen_rect[2]
-                screen_h = screen_rect[3]
-                transform_strip.transform.origin[0] = crop_info[0] / screen_w
+                transform_strip.crop.min_x = crop_info.left
+                transform_strip.crop.max_x = crop_info.right
+                transform_strip.crop.max_y = crop_info.top
+                transform_strip.crop.min_y = crop_info.bottom
+                screen_rect = utils.get_screen_rect()
+                transform_strip.transform.origin[0] = crop_info.left / screen_rect.w
                 transform_strip.transform.origin[1] = (
-                    screen_h - crop_info[2]
-                ) / screen_h
+                    screen_rect.h - crop_info.top
+                ) / screen_rect.h
         return {"FINISHED"}
 
 
