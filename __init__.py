@@ -52,17 +52,15 @@ def move_center(strip):
     strip_origin = strip.transform.origin
     strip_w = screen_rect[2] * strip.transform.scale_x
     strip_h = screen_rect[3] * strip.transform.scale_y
-    strip_half_w = strip_w * 0.5
-    strip_half_h = strip_h * 0.5
     global_origin_x = screen_w * strip_origin[0] + strip.transform.offset_x
     global_origin_y = screen_h * strip_origin[1] + strip.transform.offset_y
     screen_center_x = screen_w / 2
     screen_center_y = screen_h / 2
     strip.transform.offset_x += (
-        screen_center_x - global_origin_x - (strip_half_w - strip_w * strip_origin[0])
+        screen_center_x - global_origin_x - (0.5 - strip_origin[0]) * strip_w
     )
     strip.transform.offset_y += (
-        screen_center_y - global_origin_y - (strip_half_h - strip_h * strip_origin[1])
+        screen_center_y - global_origin_y - (0.5 - strip_origin[1]) * strip_h
     )
 
 
