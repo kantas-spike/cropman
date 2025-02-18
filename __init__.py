@@ -126,6 +126,9 @@ class CropmanAddPlaceholder(bpy.types.Operator):
         placeholder_strip[CUSTOM_KEY_STRIP_TYPE] = STRIP_TYPE_PLACEHOLDER
         placeholder_strip[CUSTOM_KEY_PLACEHOLDER_ID] = placeholder_strip.name
 
+        bpy.ops.sequencer.select_all(action="DESELECT")
+        context.scene.sequence_editor.active_strip = placeholder_strip
+
         return {"FINISHED"}
 
 
@@ -143,6 +146,7 @@ class CropmanCropAllPlaceholders(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
+        last_strip = None
         props = context.scene.cropman_props
         if props.target_strip == ID_NOT_SELECTED:
             showMessageBox(message="Please select the strip to be cropped!!")
@@ -174,6 +178,11 @@ class CropmanCropAllPlaceholders(bpy.types.Operator):
                 transform_strip.transform.origin[1] = (
                     screen_rect.h - crop_info.top
                 ) / screen_rect.h
+                last_strip = transform_strip
+
+        if last_strip:
+            bpy.ops.sequencer.select_all(action="DESELECT")
+            context.scene.sequence_editor.active_strip = last_strip
         return {"FINISHED"}
 
 
