@@ -13,7 +13,9 @@ Blender VSEで対象ストリップを、指定したサイズでクロップす
    git clone https://github.com/kantas-spike/cropman.git
    ```
 
-2. Blenderを起動し、`Preferences`-`Add-ons`から`Sequencer: Cropman`をチェックして有効にします。
+2. Blenderを起動し、`Preferences`-`Add-ons`から`Cropman`をチェックして有効にします。
+
+   ![](./images/addons.png)
 
 ## 使い方
 
