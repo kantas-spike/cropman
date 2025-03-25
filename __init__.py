@@ -7,7 +7,7 @@ bl_info = {
     "description": "Adds a transform strip cropped to the specified size.",
     "author": "kanta",
     "version": (0, 0, 1),
-    "blender": (4, 3, 0),
+    "blender": (4, 4, 0),
     "location": "VSE > Sidebar",
     "category": "Sequencer",
 }
@@ -37,7 +37,7 @@ def is_addon_generated(strip):
 def strip_names_callback(self, context):
     items = [(ID_NOT_SELECTED, "Please select Strip Name ...", "not selected")]
 
-    for seq in bpy.context.scene.sequence_editor.sequences:
+    for seq in bpy.context.scene.sequence_editor.strips:
         if is_placeholder(seq):
             continue
 
@@ -101,7 +101,7 @@ class CropmanAddPlaceholder(bpy.types.Operator):
 
     def execute(self, context):
         cur_frame = bpy.context.scene.frame_current
-        seqs = bpy.context.scene.sequence_editor.sequences
+        seqs = bpy.context.scene.sequence_editor.strips
         frame_end = cur_frame + DEFAULT_PLACEHOLDER_DURATION
 
         target_channel = guess_available_channel(
@@ -151,7 +151,7 @@ class CropmanCropAllPlaceholders(bpy.types.Operator):
         if props.target_strip == ID_NOT_SELECTED:
             showMessageBox(message="Please select the strip to be cropped!!")
         else:
-            seqs = bpy.context.scene.sequence_editor.sequences
+            seqs = bpy.context.scene.sequence_editor.strips
             placeholder_list = [s for s in seqs if is_placeholder(s)]
             target_strip = seqs.get(props.target_strip)
             for placeholder_strip in placeholder_list:
