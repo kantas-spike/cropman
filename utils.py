@@ -26,7 +26,7 @@ def get_screen_rect() -> Rect:
     return Rect(0, 0, round(width), round(height))
 
 
-def get_crop_info(placeholder_strip) -> CropInfo:
+def get_crop_info(placeholder_strip: bpy.types.ColorStrip) -> CropInfo:
     screen_rect = get_screen_rect()
     strip_origin = placeholder_strip.transform.origin
     strip_w = screen_rect.w * placeholder_strip.transform.scale_x
@@ -50,7 +50,7 @@ def get_crop_info(placeholder_strip) -> CropInfo:
     return CropInfo(*[round(elm) for elm in crop_info])
 
 
-def move_center(strip):
+def move_center(strip: bpy.types.ColorStrip):
     screen_rect = get_screen_rect()
     strip_origin = strip.transform.origin
     strip_w = screen_rect.w * strip.transform.scale_x

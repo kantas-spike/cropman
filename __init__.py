@@ -17,7 +17,7 @@ ENUM_STRING_CACHE = {}
 ID_NOT_SELECTED = "@@@not_selected@@@"
 
 
-def is_placeholder(strip):
+def is_placeholder(strip: bpy.types.Strip):
     if (
         strip.get(CUSTOM_KEY_GENERATER) == ADDON_NAME
         and strip.get(CUSTOM_KEY_STRIP_TYPE) == STRIP_TYPE_PLACEHOLDER
@@ -27,7 +27,7 @@ def is_placeholder(strip):
         return False
 
 
-def is_addon_generated(strip):
+def is_addon_generated(strip: bpy.types.Strip):
     if strip.get(CUSTOM_KEY_GENERATER) == ADDON_NAME:
         return True
     else:
@@ -108,7 +108,7 @@ class CropmanAddPlaceholder(bpy.types.Operator):
             cur_frame, frame_end, DEFAULT_PLACEHOLDER_CHANNEL_NO, seqs
         )
 
-        placeholder_strip = seqs.new_effect(
+        placeholder_strip: bpy.types.ColorStrip = seqs.new_effect(
             name=f"placeholder_{datetime.datetime.now().timestamp()}",
             type="COLOR",
             frame_start=cur_frame,
@@ -159,7 +159,7 @@ class CropmanCropAllPlaceholders(bpy.types.Operator):
                 crop_info = utils.get_crop_info(placeholder_strip)
                 seqs.remove(placeholder_strip)
                 # transform stripを追加
-                transform_strip = seqs.new_effect(
+                transform_strip: bpy.types.TransformStrip = seqs.new_effect(
                     name=f"cropped_{datetime.datetime.now().timestamp()}",
                     type="TRANSFORM",
                     channel=charnnel_no,
