@@ -1,6 +1,12 @@
-import bpy
-import datetime
-from . import utils
+if "bpy" not in locals():
+    import bpy
+    import datetime
+    from . import utils
+else:
+    import importlib
+
+    importlib.reload(utils)
+
 
 bl_info = {
     "name": "Cropman",
