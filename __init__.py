@@ -13,7 +13,7 @@ bl_info = {
     "description": "Adds a transform strip cropped to the specified size.",
     "author": "kanta",
     "version": (0, 0, 1),
-    "blender": (4, 4, 0),
+    "blender": (4, 5, 0),
     "location": "VSE > Sidebar",
     "category": "Sequencer",
 }
@@ -170,7 +170,7 @@ class CropmanCropAllPlaceholders(bpy.types.Operator):
                     type="TRANSFORM",
                     channel=charnnel_no,
                     frame_start=target_strip.frame_final_start,
-                    seq1=target_strip,
+                    input1=target_strip,
                 )
                 transform_strip[CUSTOM_KEY_GENERATER] = ADDON_NAME
                 transform_strip[CUSTOM_KEY_STRIP_TYPE] = STRIP_TYPE_CROPPED_TRANSFORM
